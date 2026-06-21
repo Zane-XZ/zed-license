@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zed License</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box }
+body { font-family: -apple-system, "Microsoft YaHei", sans-serif; background:#1a1a2e; color:#e0e0e0; min-height:100vh; display:flex; justify-content:center; padding:20px }
+.container { max-width:480px; width:100% }
+h1 { text-align:center; font-size:1.4em; margin:20px 0; color:#fff }
+.card { background:#16213e; border-radius:12px; padding:24px; margin-bottom:16px }
+.fingerprint { font-size:1.8em; font-weight:bold; text-align:center; color:#00d4ff; word-break:break-all; padding:12px; background:#0f3460; border-radius:8px; margin:12px 0; letter-spacing:1px }
+.qr-section { text-align:center; padding:16px 0 }
+.qr-section img { max-width:220px; border-radius:8px; border:2px solid #00d4ff }
+.qr-hint { color:#ffd700; font-size:0.95em; margin-top:8px }
+.input-row { display:flex; gap:8px; margin:12px 0 }
+.input-row input { flex:1; padding:12px; border-radius:8px; border:1px solid #333; background:#0f3460; color:#e0e0e0; font-size:1em }
+button { padding:12px 20px; border-radius:8px; border:none; background:#00d4ff; color:#1a1a2e; font-weight:bold; font-size:1em; cursor:pointer; white-space:nowrap }
+button:hover { background:#00b8e6 }
+.result { margin-top:16px; padding:16px; border-radius:8px; background:#0f3460; word-break:break-all; max-height:300px; overflow-y:auto; display:none }
+.result.show { display:block }
+.result pre { white-space:pre-wrap; font-size:0.85em; color:#a0ffa0; margin-bottom:12px }
+.copy-btn { background:#27ae60; width:100% }
+.copy-btn:hover { background:#219a52 }
+.copy-btn.copied { background:#555 }
+.info { color:#888; font-size:0.9em; margin-top:8px; text-align:center }
+.warn { color:#ff6b6b; font-weight:bold }
+.footer { text-align:center; margin:24px 0; font-size:0.8em; color:#666 }
+.footer a { color:#00d4ff }
+.loading { color:#ffd700; text-align:center; padding:8px; display:none }
+.loading.show { display:block }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Zed License 获取</h1>
+
+  <!-- 指纹 -->
+  <div class="card">
+    <div style="text-align:center;color:#888;font-size:0.9em">本机指纹</div>
+    <div class="fingerprint" id="fpDisplay">--</div>
+    <div class="qr-hint" style="text-align:center">▲ 付款附言请填写此指纹 ▲</div>
+
+    <div class="input-row" style="margin-top:12px">
+      <input id="fpInput" placeholder="指纹" autocomplete="off">
+      <button onclick="query()">查询</button>
+    </div>
+  </div>
+
+  <!-- 收款码 -->
+  <div class="card qr-section">
+    <div style="color:#888;font-size:0.9em;margin-bottom:8px">微信扫码付款</div>
+    <!-- 替换为你的收款码图片 -->
+    <img id="qrImg" src="qr.png" alt="微信收款码" onerror="this.style.display='none';document.getElementById('qrPlaceholder').style.display='block'">
+    <div id="qrPlaceholder" style="display:none;color:#ffd700;padding:40px">
+      ⚠ 请将收款码图片保存为<br><code>docs/license/qr.png</code>
+    </div>
+    <div class="qr-hint">付款附言填写上方指纹</div>
+  </div>
+
+  <!-- 结果 -->
+  <div class="loading" id="loading">查询中...</div>
+  <div class="result" id="result">
+    <div style="color:#888;font-size:0.9em;margin-bottom:8px">你的 license（付款后 1-3 分钟刷新可见）</div>
+    <pre id="licenseText"></pre>
+    <button class="copy-btn" id="copyBtn" onclick="copyLicense()">复制 license</button>
+    <div class="info" id="savePath"></div>
+    <div class="warn" style="margin-top:8px">⚠ 文件名必须为 license（无扩展名）</div>
+  </div>
+
+  <div class="footer">
+    <a href="https://gitee.com/xuzh_ok/zed/releases/latest" target="_blank">下载最新版 Zed</a>
+  </div>
+</div>
+
+<script>
+const fpInput = document.getElementById('fpInput')
+const fpDisplay = document.getElementById('fpDisplay')
+const result = document.getElementById('result')
+const loading = document.getElementById('loading')
+const licenseText = document.getElementById('licenseText')
+const copyBtn = document.getElementById('copyBtn')
+const savePath = document.getElementById('savePath')
+
+// 从 URL 读取指纹
+const urlParams = new URLSearchParams(location.search)
+const fpFromUrl = urlParams.get('fp')
+if (fpFromUrl) {
+  fpInput.value = fpFromUrl
+  fpDisplay.textContent = fpFromUrl
+  autoQuery()
+}
+
+fpInput.addEventListener('input', () => {
+  fpDisplay.textContent = fpInput.value || '--'
+})
+
+async function autoQuery() {
+  const fp = sanitize(fpInput.value)
+  if (!fp) return
+  await doQuery(fp)
+}
+
+async function query() {
+  const fp = sanitize(fpInput.value)
+  if (!fp) { alert('请输入指纹'); return }
+  await doQuery(fp)
+}
+
+function sanitize(fp) {
+  return fp.replace(/[^a-zA-Z0-9-]/g, '')
+}
+
+async function doQuery(fp) {
+  result.classList.remove('show')
+  loading.classList.add('show')
+  try {
+    const resp = await fetch('data/' + fp + '.txt')
+    if (!resp.ok) throw new Error('not found')
+    const text = await resp.text()
+    licenseText.textContent = text
+    savePath.innerHTML = '保存到 <code>' + getLicensePath() + '</code>'
+    result.classList.add('show')
+    copyBtn.textContent = '复制 license'
+    copyBtn.classList.remove('copied')
+  } catch {
+    licenseText.textContent = ''
+    savePath.innerHTML = '尚未签发，用手机扫码付款（附言填上方指纹），付款后 1-3 分钟刷新此页面'
+    result.classList.add('show')
+    copyBtn.style.display = 'none'
+  } finally {
+    loading.classList.remove('show')
+    copyBtn.style.display = 'block'
+  }
+}
+
+function getLicensePath() {
+  const isWin = navigator.platform.toLowerCase().includes('win')
+  const home = isWin ? 'C:\\Users\\用户名' : '~'
+  return (isWin ? home + '\\.zed\\license' : home + '/.zed/license')
+}
+
+async function copyLicense() {
+  try {
+    await navigator.clipboard.writeText(licenseText.textContent)
+    copyBtn.textContent = '已复制！'
+    copyBtn.classList.add('copied')
+    setTimeout(() => { copyBtn.textContent = '复制 license'; copyBtn.classList.remove('copied') }, 2000)
+  } catch {
+    // 降级：选中文本
+    const range = document.createRange()
+    range.selectNodeContents(licenseText)
+    const sel = window.getSelection()
+    sel.removeAllRanges()
+    sel.addRange(range)
+    copyBtn.textContent = '请手动 Ctrl+C 复制'
+  }
+}
+
+// 回车查询
+fpInput.addEventListener('keydown', e => { if (e.key === 'Enter') query() })
+</script>
+</body>
+</html>
