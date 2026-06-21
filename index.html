@@ -101,30 +101,44 @@ fpInput.addEventListener('input', () => {
 })
 
 async function autoQuery() {
-  const fp = sanitize(fpInput.value)
+  const fp = fpInput.value.trim()
   if (!fp) return
   await doQuery(fp)
 }
 
 async function query() {
-  const fp = sanitize(fpInput.value)
+  const fp = fpInput.value.trim()
   if (!fp) { alert('请输入指纹'); return }
   await doQuery(fp)
 }
 
-function sanitize(fp) {
-  return fp.replace(/[^a-zA-Z0-9-]/g, '')
+async function sha256hex(str) {
+  const buf = new TextEncoder().encode(str)
+  const hash = await crypto.subtle.digest('SHA-256', buf)
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16)
 }
 
 async function doQuery(fp) {
   result.classList.remove('show')
   loading.classList.add('show')
   try {
-    const resp = await fetch('data/' + fp + '.txt')
+    const hash = await sha256hex(fp)
+    const resp = await fetch('data/' + hash + '.txt')
     if (!resp.ok) throw new Error('not found')
     const text = await resp.text()
     licenseText.textContent = text
-    savePath.innerHTML = '保存到 <code>' + getLicensePath() + '</code>'
+    // 显示签发时间
+    try {
+      const lic = JSON.parse(text)
+      if (lic.issuedAt) {
+        const d = new Date(lic.issuedAt)
+        savePath.innerHTML = '签发时间：' + d.toLocaleString('zh-CN') + ' · 保存到 <code>' + getLicensePath() + '</code>'
+      } else {
+        savePath.innerHTML = '保存到 <code>' + getLicensePath() + '</code>'
+      }
+    } catch {
+      savePath.innerHTML = '保存到 <code>' + getLicensePath() + '</code>'
+    }
     result.classList.add('show')
     copyBtn.textContent = '复制 license'
     copyBtn.classList.remove('copied')
