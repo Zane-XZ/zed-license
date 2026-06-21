@@ -40,6 +40,7 @@ button:hover { background:#00b8e6 }
   <div class="card">
     <div style="text-align:center;color:#888;font-size:0.9em">本机指纹</div>
     <div class="fingerprint" id="fpDisplay">--</div>
+    <button onclick="copyFingerprint()" style="display:block;margin:8px auto;padding:8px 16px;border-radius:6px;border:1px solid #00d4ff;background:transparent;color:#00d4ff;cursor:pointer;font-size:0.9em">复制指纹</button>
     <div class="qr-hint" style="text-align:center">▲ 付款附言请填写此指纹 ▲</div>
 
     <div class="input-row" style="margin-top:12px">
@@ -174,6 +175,16 @@ async function copyLicense() {
     sel.addRange(range)
     copyBtn.textContent = '请手动 Ctrl+C 复制'
   }
+}
+
+async function copyFingerprint() {
+  const fp = fpDisplay.textContent
+  if (!fp || fp === '--') return
+  try {
+    await navigator.clipboard.writeText(fp)
+    event.target.textContent = '已复制！'
+    setTimeout(() => { event.target.textContent = '复制指纹' }, 2000)
+  } catch {}
 }
 
 // 回车查询
