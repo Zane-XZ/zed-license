@@ -55,6 +55,7 @@ button:hover { background:#00b8e6 }
 
   <!-- 收款码 -->
   <div class="card qr-section">
+    <div style="text-align:center;font-size:2.4em;font-weight:bold;color:#fff;margin:4px 0">¥50</div>
     <div style="color:#888;font-size:0.9em;margin-bottom:8px">微信扫码付款</div>
     <!-- 替换为你的收款码图片 -->
     <img id="qrImg" src="qr.png" alt="微信收款码" onerror="this.style.display='none';document.getElementById('qrPlaceholder').style.display='block'">
@@ -71,7 +72,7 @@ button:hover { background:#00b8e6 }
     <pre id="licenseText"></pre>
     <button class="copy-btn" id="copyBtn" onclick="copyLicense()">复制 license</button>
     <div class="info" id="savePath"></div>
-    <div class="warn" style="margin-top:8px">⚠ 文件名必须为 license（无扩展名）</div>
+    <div class="info">按 Enter 自动获取，无需手动保存</div>
   </div>
 
   <div class="warn-box">
