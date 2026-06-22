@@ -72,7 +72,7 @@ button:hover { background:#00b8e6 }
     <pre id="licenseText"></pre>
     <button class="copy-btn" id="copyBtn" onclick="copyLicense()">复制 license</button>
     <div class="info" id="savePath"></div>
-    <div class="info">按 Enter 自动获取，无需手动保存</div>
+    <div class="info" style="color:#ffd700;margin-top:12px">💡 回到 Zed 终端，按 <b>Enter</b> 键即可自动获取，无需在此页面手动复制</div>
   </div>
 
   <div class="warn-box">
@@ -146,19 +146,21 @@ async function doQuery(fp) {
       const lic = JSON.parse(text)
       if (lic.issuedAt) {
         const d = new Date(lic.issuedAt)
-        savePath.innerHTML = '签发时间：' + d.toLocaleString('zh-CN') + ' · 保存到 <code>' + getLicensePath() + '</code>'
+        savePath.innerHTML = '✅ 签发时间：' + d.toLocaleString('zh-CN') + ' · 已保存到 <code>' + getLicensePath() + '</code>'
       } else {
-        savePath.innerHTML = '保存到 <code>' + getLicensePath() + '</code>'
+        savePath.innerHTML = '✅ 已保存到 <code>' + getLicensePath() + '</code>'
       }
     } catch {
-      savePath.innerHTML = '保存到 <code>' + getLicensePath() + '</code>'
+      savePath.innerHTML = '✅ 已保存到 <code>' + getLicensePath() + '</code>'
     }
     result.classList.add('show')
     copyBtn.textContent = '复制 license'
     copyBtn.classList.remove('copied')
   } catch {
     licenseText.textContent = ''
-    savePath.innerHTML = '尚未签发，用手机扫码付款（附言填上方指纹），付款后稍等片刻刷新此页面'
+    savePath.innerHTML = '⏳ 管理员尚未签发。付款后回到 Zed 终端按 Enter 自动获取，无需刷新此页面'
+    result.classList.add('show')
+    copyBtn.style.display = 'none'
     result.classList.add('show')
     copyBtn.style.display = 'none'
   } finally {
