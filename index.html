@@ -14,8 +14,6 @@ h1 { text-align:center; font-size:1.4em; margin:20px 0; color:#fff }
 .qr-section { text-align:center; padding:16px 0 }
 .qr-section img { max-width:220px; border-radius:8px; border:2px solid #00d4ff }
 .qr-hint { color:#ffd700; font-size:0.95em; margin-top:8px }
-.price-badge { text-align:center; color:#ffd700; font-size:0.85em; letter-spacing:2px; margin-bottom:4px }
-.price-amount { text-align:center; font-size:2.8em; font-weight:bold; color:#fff; margin:4px 0 8px }
 .input-row { display:flex; gap:8px; margin:12px 0 }
 .input-row input { flex:1; padding:12px; border-radius:8px; border:1px solid #333; background:#0f3460; color:#e0e0e0; font-size:1em }
 button { padding:12px 20px; border-radius:8px; border:none; background:#00d4ff; color:#1a1a2e; font-weight:bold; font-size:1em; cursor:pointer; white-space:nowrap }
@@ -53,12 +51,11 @@ button:hover { background:#00b8e6 }
 
   <!-- 收款码 -->
   <div class="card qr-section">
-    <div class="price-badge">Zed License 永久授权</div>
-    <div class="price-amount">¥<span id="priceDisplay">50</span></div>
-    <div style="color:#888;font-size:0.9em;margin:8px 0">微信扫码付款</div>
-    <img id="qrImg" src="qr.jpg" alt="微信收款码" onerror="this.style.display='none';document.getElementById('qrPlaceholder').style.display='block'">
+    <div style="color:#888;font-size:0.9em;margin-bottom:8px">微信扫码付款</div>
+    <!-- 替换为你的收款码图片 -->
+    <img id="qrImg" src="qr.png" alt="微信收款码" onerror="this.style.display='none';document.getElementById('qrPlaceholder').style.display='block'">
     <div id="qrPlaceholder" style="display:none;color:#ffd700;padding:40px">
-      ⚠ 请将收款码图片保存为<br><code>qr.jpg</code>
+      ⚠ 请将收款码图片保存为<br><code>docs/license/qr.png</code>
     </div>
     <div class="qr-hint">付款附言填写上方指纹</div>
   </div>
@@ -75,10 +72,10 @@ button:hover { background:#00b8e6 }
 
   <div class="footer">
     下载：
-    <a href="https://wwbmb.lanzoum.com/ilAOO3sjigpa" target="_blank">Windows</a>
+    <a href="https://wwbmb.lanzoum.com/ij5TP3snuqvc" target="_blank">Windows</a>
     ·
-    <a href="https://wwbmb.lanzoum.com/i5IkI3sjifwb" target="_blank">Linux</a>
-    <span style="color:#888;font-size:0.8em">(提取码 b31h)</span>
+    <a href="https://wwbmb.lanzoum.com/iHNao3snuqab" target="_blank">Linux</a>
+    <span style="color:#888;font-size:0.8em">(提取码 a7pa)</span>
   </div>
 </div>
 
