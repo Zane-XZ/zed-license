@@ -14,6 +14,10 @@ h1 { text-align:center; font-size:1.4em; margin:20px 0; color:#fff }
 .qr-section { text-align:center; padding:16px 0 }
 .qr-section img { max-width:220px; border-radius:8px; border:2px solid #00d4ff }
 .qr-hint { color:#ffd700; font-size:0.95em; margin-top:8px }
+.copy-fp-btn { display:block; margin:8px auto; padding:14px 24px; border-radius:8px; border:2px solid #ff4444; background:#ff444422; color:#ff6666; cursor:pointer; font-size:1.1em; font-weight:bold }
+.copy-fp-btn:hover { background:#ff444444; color:#ff8888 }
+.copy-fp-btn.copied { border-color:#27ae60; color:#27ae60; background:#27ae6022 }
+.warn-box { background:#ff444422; border:1px solid #ff4444; border-radius:8px; padding:16px; margin-top:16px; text-align:center; color:#ff6666; font-size:0.95em; line-height:1.6 }
 .input-row { display:flex; gap:8px; margin:12px 0 }
 .input-row input { flex:1; padding:12px; border-radius:8px; border:1px solid #333; background:#0f3460; color:#e0e0e0; font-size:1em }
 button { padding:12px 20px; border-radius:8px; border:none; background:#00d4ff; color:#1a1a2e; font-weight:bold; font-size:1em; cursor:pointer; white-space:nowrap }
@@ -40,8 +44,8 @@ button:hover { background:#00b8e6 }
   <div class="card">
     <div style="text-align:center;color:#888;font-size:0.9em">本机指纹</div>
     <div class="fingerprint" id="fpDisplay">--</div>
-    <button id="copyFpBtn" onclick="copyFingerprint(this)" style="display:block;margin:8px auto;padding:8px 16px;border-radius:6px;border:1px solid #00d4ff;background:transparent;color:#00d4ff;cursor:pointer;font-size:0.9em">复制指纹</button>
-    <div class="qr-hint" style="text-align:center">▲ 付款附言请填写此指纹 ▲</div>
+    <button id="copyFpBtn" class="copy-fp-btn" onclick="copyFingerprint(this)">📋 复制指纹（付款时必须粘贴到备注！）</button>
+    <div class="qr-hint" style="text-align:center;font-size:1.1em">⚠️ 付款附言必须填写指纹，否则无法自动匹配 ⚠️</div>
 
     <div class="input-row" style="margin-top:12px">
       <input id="fpInput" placeholder="指纹" autocomplete="off">
@@ -70,6 +74,11 @@ button:hover { background:#00b8e6 }
     <div class="warn" style="margin-top:8px">⚠ 文件名必须为 license（无扩展名）</div>
   </div>
 
+  <div class="warn-box">
+    ❓ <b>已付款但忘记填写备注？</b><br>
+    请将微信<b>付款截图</b>发送至飞书群 @Zed，注明你的指纹，管理员将手动处理。
+  </div>
+
   <div class="footer">
     下载：
     <a href="https://wwbmb.lanzoum.com/ij5TP3snuqvc" target="_blank">Windows</a>
@@ -94,6 +103,8 @@ const fpFromUrl = urlParams.get('fp')
 if (fpFromUrl) {
   fpInput.value = fpFromUrl
   fpDisplay.textContent = fpFromUrl
+  // 自动复制到剪贴板
+  try { navigator.clipboard.writeText(fpFromUrl) } catch {}
   autoQuery()
 }
 
