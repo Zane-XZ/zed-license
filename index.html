@@ -75,12 +75,9 @@ button:hover { background:#00b8e6 }
   </div>
 
   <div class="warn-box">
-    ❓ <b>已付款但忘记填写备注？</b><br>
-    将以下信息发送至飞书群 <b>@Zed</b>：<br>
-    <span style="color:#ffd700">指纹：</span><span id="fallbackFp">--</span><br>
-    <span style="color:#ffd700">付款时间：</span><span id="fallbackTime">--</span><br>
-    <button id="copyFallbackBtn" onclick="copyFallback()" style="margin-top:8px;background:#ff4444;color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:0.9em">📋 复制以上信息</button>
-    <br><small style="color:#888">管理员核对后手动签发，约 5-10 分钟</small>
+    ❓ <b>付款时忘记备注指纹？</b><br>
+    不用担心——未匹配的付款 <b>48 小时内自动退回</b>。<br>
+    请重新付款，这次记得在<b>备注</b>中粘贴指纹即可。
   </div>
 
   <div class="footer">
@@ -100,11 +97,6 @@ const loading = document.getElementById('loading')
 const licenseText = document.getElementById('licenseText')
 const copyBtn = document.getElementById('copyBtn')
 const savePath = document.getElementById('savePath')
-const fallbackFp = document.getElementById('fallbackFp')
-const fallbackTime = document.getElementById('fallbackTime')
-
-// 记录当前时间供补救使用
-fallbackTime.textContent = new Date().toLocaleString('zh-CN')
 
 // 从 URL 读取指纹
 const urlParams = new URLSearchParams(location.search)
@@ -118,15 +110,8 @@ if (fpFromUrl) {
 }
 
 fpInput.addEventListener('input', () => {
-  const fp = fpInput.value || '--'
-  fpDisplay.textContent = fp
-  fallbackFp.textContent = fp
+  fpDisplay.textContent = fpInput.value || '--'
 })
-
-// 指纹从 URL 加载后同步到补救区
-if (fpFromUrl) {
-  fallbackFp.textContent = fpFromUrl
-}
 
 async function autoQuery() {
   const fp = fpInput.value.trim()
@@ -210,21 +195,6 @@ async function copyFingerprint(btn) {
   await navigator.clipboard.writeText(fp)
   btn.textContent = '已复制！'
   setTimeout(() => { btn.textContent = '复制指纹' }, 2000)
-}
-
-async function copyFallback() {
-  const msg = `指纹：${fallbackFp.textContent}\n付款时间：${fallbackTime.textContent}\n付款金额：¥50\n备注忘记填写，请手动签发`
-  try {
-    await navigator.clipboard.writeText(msg)
-    const btn = document.getElementById('copyFallbackBtn')
-    btn.textContent = '已复制！'
-    setTimeout(() => { btn.textContent = '📋 复制以上信息' }, 2000)
-  } catch {}
-}
-
-// 指纹从 URL 加载后同步到补救区
-if (fpFromUrl) {
-  fallbackFp.textContent = fpFromUrl
 }
 
 // 回车查询
