@@ -1,5 +1,0 @@
-{
-  "fingerprint": "da16b33ab3964e19a98d3c0a2f6ae7d6",
-  "signature": "m6POpcsUX7IUYCDz1t0vf/JoVRLmQL8oAd8wNh1c6rfkI995E1YsNxR7Z8rxCgANEGPCpB5FIkKlALwpyu0sCw==",
-  "issuedAt": "2026-06-23T01:04:53.548Z"
-}
